@@ -12,7 +12,8 @@ import mammoth
 sys.path.insert(0, "/workspace/risk-watcher")
 from tvv_nav import nav, NAV_CSS, favicon_links, ensure_favicons
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-T = "TVV Longevity Watcher Digest"
+T = "TVV Longevity Watch"        # page <title>
+H1 = "LONGEVITY WATCH"           # masthead title (all caps)
 URL = "https://atlantean2.github.io/tvv-longevity-watcher-digest/"
 NOTICE = "Not medical advice."
 META = "issues.json"
@@ -53,9 +54,11 @@ CSS = """body{margin:0;font:16px/1.55 Arial,Helvetica,sans-serif;color:#111;back
 header{border-bottom:3px solid #1aa88b;display:flex;align-items:center;gap:14px;padding:8px 16px}
 header img.logo{height:56px}header h1{font-size:1.25rem;margin:0}header .sub{font-size:.8rem;color:#444;margin-top:2px}
 header .grow{flex:1 1 auto;min-width:0}
-/* Longevity Watcher Sage portrait slot (portrait coming later). Hidden until an <img> is placed inside and class "on" is added. */
-.sage-slot{display:none;flex:0 0 auto;width:84px;height:84px;border-radius:50%;border:2px solid #1aa88b;background:#f3f3f3;overflow:hidden}
-.sage-slot.on{display:block}.sage-slot img{width:100%;height:100%;object-fit:cover;display:block}
+/* Masthead banner: Duo 3 painting (assets/masthead-duo3.webp, 1152x864), wide strip, cover, focus on the two people. */
+.banner{max-width:1040px;margin:0 auto;background:#0b0f08}
+.banner img{display:block;width:100%;aspect-ratio:2.4/1;max-height:400px;object-fit:cover;object-position:50% 3%}
+/* Longevity Watcher Sage portrait slot: hidden for now (assets/sage.png kept, not shown). */
+.sage-slot{display:none}
 #tabs{display:flex;gap:6px;overflow-x:auto;white-space:nowrap;padding:6px 12px;background:#f3f3f3;border-bottom:1px solid #ddd;align-items:center}
 #tabs .al{font:700 12px Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#555;padding-right:4px}
 #tabs button{flex:0 0 auto;font:600 14px Arial,sans-serif;padding:6px 12px;border:1px solid #bbb;border-radius:16px;background:#fff;color:#222;cursor:pointer}
@@ -71,7 +74,7 @@ table.lw th,table.lw td{border:1px solid #ccc;padding:5px 8px;text-align:left;ve
 table.lw td p,table.lw th p{margin:0}
 p{overflow-wrap:anywhere}
 footer{max-width:1040px;margin:0 auto;padding:14px 16px 40px;font-size:.85rem;color:#333;border-top:1px solid #ddd}
-@media(max-width:600px){header img.logo{height:40px}header h1{font-size:1rem}.sage-slot{width:56px;height:56px}}
+@media(max-width:600px){header img.logo{height:40px}header h1{font-size:1rem}.banner img{aspect-ratio:1.6/1;max-height:260px;object-position:50% 12%}}
 """
 
 def main():
@@ -97,7 +100,7 @@ catch(e){m.innerHTML='<p>Could not load '+d+'.</p>'}}
 const TT=document.title;tabs.forEach(t=>t.onclick=()=>{location.hash=t.dataset.d});
 addEventListener('hashchange',()=>show(location.hash.slice(1)));show(location.hash.slice(1));"""
     desc = "Weekly longevity digest from TechVestVentures: science and regulation, behavioral and physical tools, social and economic longevity, with every source linked. Not medical advice."
-    open("index.html", "w").write(f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{T}</title><meta name="description" content="{E(desc)}"><meta property="og:title" content="{T}"><meta property="og:description" content="{E(desc)}"><meta property="og:type" content="website"><meta property="og:url" content="{URL}">{favicon_links("assets/")}<link rel="stylesheet" href="assets/style.css"></head><body>{nav("lwdigest")}<div id="top"><header><img class="logo" src="assets/logo.png" alt="TVV logo"><div class="grow"><h1>{T}</h1><div class="sub">Weekly, Fridays · Not medical advice</div></div><!-- Longevity Watcher Sage portrait goes here: add <img src="assets/sage.png" alt="Longevity Watcher Sage"> and class "on" --><div class="sage-slot on" id="lw-sage"><img src="assets/sage.png" alt="Longevity Watcher Sage"></div></header><nav id="tabs" role="tablist" aria-label="Issue archive"><span class="al">Archive</span>{tabs}</nav></div><main id="content">{latest_body}</main><noscript><footer><strong>Archive</strong><ul>{archive}</ul></footer></noscript><footer><strong>{NOTICE}</strong> Research intelligence for editorial and advisory use only; discuss any drug, supplement, device or test with a clinician. Published by TechVestVentures. Every source is linked at the end of each issue.</footer><script>{JS}</script></body></html>''')
+    open("index.html", "w").write(f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{T}</title><meta name="description" content="{E(desc)}"><meta property="og:title" content="{T}"><meta property="og:image" content="{URL}assets/masthead-duo3.webp"><meta property="og:description" content="{E(desc)}"><meta property="og:type" content="website"><meta property="og:url" content="{URL}">{favicon_links("assets/")}<link rel="stylesheet" href="assets/style.css"></head><body>{nav("lwdigest")}<div class="banner"><img src="assets/masthead-duo3.webp" width="1152" height="864" alt="An active older couple walking a sunlit forest trail, both wearing teal exoskeleton leg supports and glasses (illustration)"></div><div id="top"><header><img class="logo" src="assets/logo.png" alt="TVV logo"><div class="grow"><h1>{H1}</h1><div class="sub">Weekly, Fridays · Not medical advice</div></div></header><nav id="tabs" role="tablist" aria-label="Issue archive"><span class="al">Archive</span>{tabs}</nav></div><main id="content">{latest_body}</main><noscript><footer><strong>Archive</strong><ul>{archive}</ul></footer></noscript><footer><strong>{NOTICE}</strong> Research intelligence for editorial and advisory use only; discuss any drug, supplement, device or test with a clinician. Published by TechVestVentures. Every source is linked at the end of each issue.</footer><script>{JS}</script></body></html>''')
     print("index.html:", len(issues), "issue(s)")
 
 if __name__ == "__main__":

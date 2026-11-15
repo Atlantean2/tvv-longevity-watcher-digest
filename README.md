@@ -1,4 +1,4 @@
-# TVV Longevity Watcher Digest
+# LONGEVITY WATCH (TVV Longevity Watch)
 
 Public site: https://atlantean2.github.io/tvv-longevity-watcher-digest/
 
@@ -19,6 +19,8 @@ git push origin main
 Add `--test` to the build command to label an issue "test issue". `python3 build.py` alone rebuilds index and CSS from `issues/`.
 `build.py` reads the shared sidebar from `/workspace/risk-watcher/tvv_nav.py`.
 
-## Sage portrait
+## Masthead art
 
-The masthead has a hidden `.sage-slot`. To show the Longevity Watcher Sage: put the image at `assets/sage.png`, add `<img src="assets/sage.png" alt="Longevity Watcher Sage">` inside `#lw-sage` and add class `on`.
+The masthead banner is the "Duo 3" painting (active older couple on a forest trail in teal exoskeletons), saved as `assets/masthead-duo3.webp` (1152x864, webp) and shown as a wide cropped strip (`.banner img`, object-fit cover, focus on the two people). `build.py` writes it into every rebuild; the page title is `TVV Longevity Watch` and the masthead title is `LONGEVITY WATCH`.
+
+The provisional single-man Sage portrait (`assets/sage.png`, `assets/sage-full.jpg`) is kept in the repo but not shown; the `.sage-slot` CSS is hidden.

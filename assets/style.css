@@ -3,9 +3,11 @@ body{margin:0;font:16px/1.55 Arial,Helvetica,sans-serif;color:#111;background:#f
 header{border-bottom:3px solid #1aa88b;display:flex;align-items:center;gap:14px;padding:8px 16px}
 header img.logo{height:56px}header h1{font-size:1.25rem;margin:0}header .sub{font-size:.8rem;color:#444;margin-top:2px}
 header .grow{flex:1 1 auto;min-width:0}
-/* Longevity Watcher Sage portrait slot (portrait coming later). Hidden until an <img> is placed inside and class "on" is added. */
-.sage-slot{display:none;flex:0 0 auto;width:84px;height:84px;border-radius:50%;border:2px solid #1aa88b;background:#f3f3f3;overflow:hidden}
-.sage-slot.on{display:block}.sage-slot img{width:100%;height:100%;object-fit:cover;display:block}
+/* Masthead banner: Duo 3 painting (assets/masthead-duo3.webp, 1152x864), wide strip, cover, focus on the two people. */
+.banner{max-width:1040px;margin:0 auto;background:#0b0f08}
+.banner img{display:block;width:100%;aspect-ratio:2.4/1;max-height:400px;object-fit:cover;object-position:50% 3%}
+/* Longevity Watcher Sage portrait slot: hidden for now (assets/sage.png kept, not shown). */
+.sage-slot{display:none}
 #tabs{display:flex;gap:6px;overflow-x:auto;white-space:nowrap;padding:6px 12px;background:#f3f3f3;border-bottom:1px solid #ddd;align-items:center}
 #tabs .al{font:700 12px Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#555;padding-right:4px}
 #tabs button{flex:0 0 auto;font:600 14px Arial,sans-serif;padding:6px 12px;border:1px solid #bbb;border-radius:16px;background:#fff;color:#222;cursor:pointer}
@@ -21,7 +23,7 @@ table.lw th,table.lw td{border:1px solid #ccc;padding:5px 8px;text-align:left;ve
 table.lw td p,table.lw th p{margin:0}
 p{overflow-wrap:anywhere}
 footer{max-width:1040px;margin:0 auto;padding:14px 16px 40px;font-size:.85rem;color:#333;border-top:1px solid #ddd}
-@media(max-width:600px){header img.logo{height:40px}header h1{font-size:1rem}.sage-slot{width:56px;height:56px}}
+@media(max-width:600px){header img.logo{height:40px}header h1{font-size:1rem}.banner img{aspect-ratio:1.6/1;max-height:260px;object-position:50% 12%}}
 
 #tvvnav{position:fixed;left:0;top:0;bottom:0;width:280px;box-sizing:border-box;padding:12px 10px;background:#000;color:#fff;border-right:1px solid #333;font-family:Arial,Helvetica,sans-serif;overflow-y:auto;z-index:20}
 #tvvnav summary{list-style:none;cursor:default;display:flex;align-items:center;gap:8px;border-bottom:1px solid #e8063c;padding-bottom:9px;margin-bottom:10px}
