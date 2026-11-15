@@ -21,6 +21,10 @@ ul.items{margin-left:24px;padding-left:1.1em}ul.items li{margin:7px 0}
 .tw{overflow-x:auto;margin:10px 0}table.lw{border-collapse:collapse;width:100%;font-size:.9rem}
 table.lw th,table.lw td{border:1px solid #ccc;padding:5px 8px;text-align:left;vertical-align:top}table.lw th{background:#e9f7f3;white-space:nowrap}
 table.lw td p,table.lw th p{margin:0}
+table.lw{min-width:720px;font-size:.95rem}
+.toc-title{font-weight:700;margin:14px 0 4px}div.toc{margin:0 0 10px;columns:2;column-gap:28px}p.toc-item{margin:3px 0;break-inside:avoid}div.toc a{font-weight:600}
+figure.end{margin:18px auto;text-align:center}figure.end img{width:100%;height:auto;max-width:560px;display:block;margin:0 auto;border-radius:4px}
+@media(max-width:700px){div.toc{columns:1}}
 p{overflow-wrap:anywhere}
 footer{max-width:1040px;margin:0 auto;padding:14px 16px 40px;font-size:.85rem;color:#333;border-top:1px solid #ddd}
 @media(max-width:600px){header img.logo{height:40px}header h1{font-size:1rem}.banner img{aspect-ratio:1.6/1;max-height:260px;object-position:50% 12%}}

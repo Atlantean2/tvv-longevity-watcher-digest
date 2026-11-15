@@ -24,7 +24,29 @@ def lab(d, test):
     return f"{x:%b} {x.day}, {x.year}" + (" · test issue" if test else "")
 
 def render(d, src, test):
-    b = mammoth.convert_to_html(open(src, "rb")).value
+    imgs = []
+    def _img(i):
+        # extract embedded image(s), compress to webp (max 900px wide) into issues/img/, with alt text
+        from PIL import Image
+        import io
+        with i.open() as f: data = f.read()
+        im = Image.open(io.BytesIO(data)).convert("RGB")
+        if im.width > 900: im = im.resize((900, round(im.height * 900 / im.width)), Image.LANCZOS)
+        os.makedirs("issues/img", exist_ok=True)
+        fn = f"{d}-fig{len(imgs) + 1}.webp"
+        im.save(f"issues/img/{fn}", "WEBP", quality=74, method=6)
+        imgs.append(fn)
+        alt = i.alt_text or "Illustration: an active older couple walking a sunlit forest trail, both wearing teal exoskeleton leg supports and glasses"
+        return {"src": f"img/{fn}", "alt": alt, "width": str(im.width), "height": str(im.height), "loading": "lazy"}
+    b = mammoth.convert_to_html(open(src, "rb"), convert_image=mammoth.images.img_element(_img)).value
+    # embedded image paragraph -> centered figure
+    b = re.sub(r"<p>(?:<strong>)?\s*(<img [^>]*/>)\s*(?:</strong>)?</p>", r'<figure class="end">\1</figure>', b)
+    # Section Contents (docx 'Digest Sections:' list, entries typed '1.<tab>TITLE') -> linked list
+    def _toc(m):
+        items = re.findall(r"<p><strong>(\d{1,2})\.\s*([^<]*?)\s*</strong></p>", m.group(2))
+        li = "".join(f'<p class="toc-item"><a href="#sec-{n}" class="toc-link">{n}. {t}</a></p>' for n, t in items)
+        return f'<p class="toc-title">{m.group(1)}</p><div class="toc">{li}</div>'
+    b = re.sub(r"<p><strong>(Digest Sections:|Section Contents:?)</strong></p>((?:<p><strong>\d{1,2}\.\t[^<]*</strong></p>)+)", _toc, b)
     # public page: drop local directory of the internal spreadsheet; drop internal routing note
     b = b.replace("/workspace/longevity-supplements/", "")
     b = re.sub(r"\s*Stays out of Victoria, TVV and Psychometric Assessments\.", "", b)
@@ -72,6 +94,10 @@ ul.items{margin-left:24px;padding-left:1.1em}ul.items li{margin:7px 0}
 .tw{overflow-x:auto;margin:10px 0}table.lw{border-collapse:collapse;width:100%;font-size:.9rem}
 table.lw th,table.lw td{border:1px solid #ccc;padding:5px 8px;text-align:left;vertical-align:top}table.lw th{background:#e9f7f3;white-space:nowrap}
 table.lw td p,table.lw th p{margin:0}
+table.lw{min-width:720px;font-size:.95rem}
+.toc-title{font-weight:700;margin:14px 0 4px}div.toc{margin:0 0 10px;columns:2;column-gap:28px}p.toc-item{margin:3px 0;break-inside:avoid}div.toc a{font-weight:600}
+figure.end{margin:18px auto;text-align:center}figure.end img{width:100%;height:auto;max-width:560px;display:block;margin:0 auto;border-radius:4px}
+@media(max-width:700px){div.toc{columns:1}}
 p{overflow-wrap:anywhere}
 footer{max-width:1040px;margin:0 auto;padding:14px 16px 40px;font-size:.85rem;color:#333;border-top:1px solid #ddd}
 @media(max-width:600px){header img.logo{height:40px}header h1{font-size:1rem}.banner img{aspect-ratio:1.6/1;max-height:260px;object-position:50% 12%}}
@@ -90,15 +116,16 @@ def main():
     tabs = "".join(f'<button role="tab" data-d="{d}" aria-selected="false">{E(labels[d])}</button>' for d in issues)
     # static copy of the latest issue so the page reads without JavaScript; JS swaps in the chosen issue
     latest = open(f"issues/{issues[0]}.html").read()
-    latest_body = re.search(r'<main id="issue">(.*)</main>', latest, re.S).group(1)
+    latest_body = re.search(r'<main id="issue">(.*)</main>', latest, re.S).group(1).replace('src="img/', 'src="issues/img/')
     archive = "".join(f'<li><a href="issues/{d}.html?raw">{E(labels[d])}</a></li>' for d in issues)
     JS = """const tabs=[...document.querySelectorAll('#tabs button')],m=document.getElementById('content'),ds=tabs.map(t=>t.dataset.d);
 async function show(d){if(!ds.includes(d))d=ds[0];tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.d==d));
 m.innerHTML='<p>Loading…</p>';try{const r=await fetch('issues/'+d+'.html',{cache:'no-cache'});const doc=new DOMParser().parseFromString(await r.text(),'text/html');
-const c=doc.querySelector('#issue');m.innerHTML=c.innerHTML;document.title=TT+' — '+tabs.find(t=>t.dataset.d==d).textContent;window.scrollTo(0,0)}
+const c=doc.querySelector('#issue');c.querySelectorAll('img').forEach(i=>{const u=i.getAttribute('src');if(!/^(https?:|\\/)/.test(u))i.setAttribute('src','issues/'+u)});m.innerHTML=c.innerHTML;document.title=TT+' — '+tabs.find(t=>t.dataset.d==d).textContent;window.scrollTo(0,0)}
 catch(e){m.innerHTML='<p>Could not load '+d+'.</p>'}}
 const TT=document.title;tabs.forEach(t=>t.onclick=()=>{location.hash=t.dataset.d});
-addEventListener('hashchange',()=>show(location.hash.slice(1)));show(location.hash.slice(1));"""
+function go(){const h=location.hash.slice(1);if(/^sec-\\d+$/.test(h)){const e=document.getElementById(h);if(e){e.scrollIntoView();return true}}return false}
+addEventListener('hashchange',()=>{if(!go())show(location.hash.slice(1))});show(location.hash.slice(1)).then(()=>{go()});"""
     desc = "Weekly longevity digest from TechVestVentures: science and regulation, behavioral and physical tools, social and economic longevity, with every source linked. Not medical advice."
     open("index.html", "w").write(f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{T}</title><meta name="description" content="{E(desc)}"><meta property="og:title" content="{T}"><meta property="og:image" content="{URL}assets/masthead-duo3.webp"><meta property="og:description" content="{E(desc)}"><meta property="og:type" content="website"><meta property="og:url" content="{URL}">{favicon_links("assets/")}<link rel="stylesheet" href="assets/style.css"></head><body>{nav("lwdigest")}<div class="banner"><img src="assets/masthead-duo3.webp" width="1152" height="864" alt="An active older couple walking a sunlit forest trail, both wearing teal exoskeleton leg supports and glasses (illustration)"></div><div id="top"><header><img class="logo" src="assets/logo.png" alt="TVV logo"><div class="grow"><h1>{H1}</h1><div class="sub">Weekly, Fridays · Not medical advice</div></div></header><nav id="tabs" role="tablist" aria-label="Issue archive"><span class="al">Archive</span>{tabs}</nav></div><main id="content">{latest_body}</main><noscript><footer><strong>Archive</strong><ul>{archive}</ul></footer></noscript><footer><strong>{NOTICE}</strong> Research intelligence for editorial and advisory use only; discuss any drug, supplement, device or test with a clinician. Published by TechVestVentures. Every source is linked at the end of each issue.</footer><script>{JS}</script></body></html>''')
     print("index.html:", len(issues), "issue(s)")
